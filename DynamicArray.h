@@ -7,6 +7,8 @@
 
 
 #include <cstddef>
+#include <exception>
+#include <iostream>
 
 class DynamicArray {
 private:
@@ -31,10 +33,47 @@ public:
     int popBack();
 
     DynamicArray operator[](int i) const;
-    DynamicArray& operator=(DynamicArray& arr);
+    DynamicArray& operator=(const DynamicArray& arr);
+    DynamicArray& operator=(DynamicArray&& arr) noexcept;
+    DynamicArray operator+(const DynamicArray& arr);
+
+    bool operator==(const DynamicArray &rhs) const;
+    bool operator!=(const DynamicArray &rhs) const;
+
+    bool operator<(const DynamicArray &rhs) const;
+    bool operator>(const DynamicArray &rhs) const;
+    bool operator<=(const DynamicArray &rhs) const;
+    bool operator>=(const DynamicArray &rhs) const;
+
+    friend std::ostream &operator<<(std::ostream &os, const DynamicArray &array);
+
+    class DifSizeException : public std::exception {
+        const char *message;
+    public:
+        DifSizeException(const char *theMessage) : message(theMessage) {}
+        const char *what() const noexcept { return message; }
+    };
 };
 
+std::ostream &operator<<(std::ostream &os, const DynamicArray &array) {
+    os << " size: " << array.size << " arrCapacity: " << array.arrCapacity << " data: ";
+    for (int i = 0; i < array.size; ++i) {
+        os << array.data[i] << " ";
+    }
+    return os;
+}
 
-
-
+std::istream &operator>>(std::istream &in, DynamicArray &array) {
+    size_t size;
+    int elem;
+    std::cout << "Enter size: ";
+    in >> size;
+    array.resize(size);
+    std::cout << "Enter " << size << " elements: ";
+    for (int i = 0; i < size; ++i) {
+        in >> elem;
+        array[i] = elem;
+    }
+    return in;
+}
 #endif //YAVU_LAB1_DYNAMICARRAY_H
