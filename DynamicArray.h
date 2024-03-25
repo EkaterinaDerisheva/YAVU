@@ -34,7 +34,7 @@ public:
     void pushBack(int x);
     int popBack();
 
-    DynamicArray operator[](int i) const;
+    int& operator[](int i) const;
     DynamicArray& operator=(const DynamicArray& arr);
     DynamicArray& operator=(DynamicArray&& rhs) noexcept;
     DynamicArray operator+(const DynamicArray& arr);
@@ -59,7 +59,7 @@ std::ostream &operator<<(std::ostream &os, const DynamicArray *array) {
     assert((array != nullptr));
     os << " size: " << array->getSize() << " arrCapacity: " << array->capacity() << " data: ";
     for (int i = 0; i < array->getSize(); ++i) {
-        os << &array[i] << " ";
+        os << (*array)[i] << " ";
     }
     return os;
 }

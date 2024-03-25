@@ -124,7 +124,7 @@ int DynamicArray::popBack() {
     return elem;
 }
 
-DynamicArray DynamicArray::operator[](int i) const {
+int& DynamicArray::operator[](int i) const {
     assert((i >= 0) && "Error! Index shouldn't be negative");
     assert((i < size) && "Error! Index is out of bound");
     return data[i];
