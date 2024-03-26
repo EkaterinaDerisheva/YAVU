@@ -5,69 +5,90 @@
 #include "DynamicArray.h"
 #include <iostream>
 #include <cassert>
-DynamicArray::DynamicArray() : size(0), arrCapacity(1) {
+DynamicArray::DynamicArray() {
+    size = 0;
     try {
+        arrCapacity = 1;
         data = new int[arrCapacity];
     } catch (std::bad_alloc e) {
+        arrCapacity = 0;
         throw e;
     }
 }
 
-DynamicArray::DynamicArray(size_t size) : size(size), arrCapacity(size) {
+DynamicArray::DynamicArray(size_t size) {
     assert((size >= 0) && "Error! Size shouldn't be negative");
     try {
         data = new int[arrCapacity];
     } catch (std::bad_alloc e) {
+        arrCapacity = 0;
+        this->size = 0;
         throw e;
     }
+    this->size = size;
+    arrCapacity = size;
     for (int i = 0; i < size; ++i) {
         data[i] = 0;
     }
 }
 
-DynamicArray::DynamicArray(size_t size, int n) : size(size), arrCapacity(size) {
+DynamicArray::DynamicArray(size_t size, int n) {
     assert((size >= 0) && "Error! Size shouldn't be negative");
     try {
         data = new int[arrCapacity];
     } catch (std::bad_alloc e) {
+        arrCapacity = 0;
+        size = 0;
         throw e;
     }
+    this->size = size;
+    arrCapacity = size;
     for (int i = 0; i < size; ++i) {
         data[i] = n;
     }
 }
 
-DynamicArray::DynamicArray(size_t arrCapacity, size_t size) : arrCapacity(arrCapacity), size(size) {
-    assert((arrCapacity >= 0) && "Error! Capacity shouldn't be negative");
+DynamicArray::DynamicArray(size_t arrCapacity, size_t size) {
     assert((size >= 0) && "Error! Size shouldn't be negative");
     assert((arrCapacity >= size) && "Error! Capacity can't be less than size");
     try {
         data = new int[arrCapacity];
     } catch (std::bad_alloc e) {
+        arrCapacity = 0;
+        size = 0;
         throw e;
     }
+    this->size = size;
+    this->arrCapacity = arrCapacity;
     for (int i = 0; i < size; ++i) {
         data[i] = 0;
     }
 }
 
-DynamicArray::DynamicArray(DynamicArray const &arr) : size(arr.size), arrCapacity(arr.arrCapacity) {
+DynamicArray::DynamicArray(DynamicArray const &arr) {
     assert((&arr != nullptr) && "Error! Arr is null");
     try {
         data = new int[arrCapacity];
     } catch (std::bad_alloc e) {
+        arrCapacity = 0;
+        size = 0;
         throw e;
     }
+    size = arr.size;
+    arrCapacity = arr.arrCapacity;
     for (int i = 0; i < size; ++i) {
         data[i] = arr.data[i];
     }
 }
 
-DynamicArray::DynamicArray(DynamicArray &&arr) : size(arr.size), arrCapacity(arr.arrCapacity), data(arr.data) {
+DynamicArray::DynamicArray(DynamicArray &&arr) {
     assert((&arr != nullptr) && "Error! Arr is null");
-    data = nullptr;
-    size = 0;
-    arrCapacity = 0;
+    size = arr.size;
+    arrCapacity = arr.arrCapacity;
+    data = arr.data;
+    arr.data = nullptr;
+    arr.size = 0;
+    arr.arrCapacity = 0;
 }
 
 DynamicArray::~DynamicArray() {
@@ -107,6 +128,11 @@ void DynamicArray::resize(size_t newSize) {
             data[i] = 0;
         }
     }
+    else if (newSize < size) {
+        for (int i = newSize; i < size; ++i) {
+            data[i] = 0;
+        }
+    }
     size = newSize;
 }
 
@@ -133,9 +159,10 @@ int& DynamicArray::operator[](int i) const {
 DynamicArray &DynamicArray::operator=(const DynamicArray &rhs) {
     assert((&rhs != nullptr) && "Error! Arr is null");
     if (this != &rhs) {
-        delete[] data;
         try {
-            data = new int[rhs.size];
+            int* newData = new int[rhs.size];
+            delete[] data;
+            data = newData;
         } catch (std::bad_alloc e) {
             throw e;
         }
@@ -189,6 +216,7 @@ bool DynamicArray::operator<(const DynamicArray &rhs) const {
     for (int i = 0; i < minSize; ++i) {
         if(data[i] >= rhs.data[i]) return false;
     }
+    if (size >= rhs.size) return false;
     return true;
 }
 
@@ -201,7 +229,6 @@ bool DynamicArray::operator<=(const DynamicArray &rhs) const {
 }
 
 bool DynamicArray::operator>=(const DynamicArray &rhs) const {
-
     return !(*this < rhs);
 }
 
